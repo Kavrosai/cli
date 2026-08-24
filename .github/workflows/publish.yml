@@ -1,0 +1,70 @@
+name: Publish @enclavia-os/cli
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Remove deprecated npm config
+        shell: bash
+        run: |
+          npm config delete always-auth --location=user || true
+          npm config delete always-auth --location=global || true
+
+      - name: Validate release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          package_version=$(node -p "require('./package.json').version")
+          tag_version="${GITHUB_REF_NAME#v}"
+          if [ "$package_version" != "$tag_version" ]; then
+            echo "Package version $package_version does not match tag $GITHUB_REF_NAME"
+            exit 1
+          fi
+
+      - name: Run tests
+        run: npm test
+
+      - name: Inspect package contents
+        run: npm pack --dry-run
+
+      - name: Select npm authentication
+        id: npm-auth
+        shell: bash
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "$NPM_TOKEN" ]; then
+            echo "mode=token" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=trusted-publishing" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish package with bootstrap token
+        if: steps.npm-auth.outputs.mode == 'token'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance=false
+
+      - name: Publish package with npm Trusted Publishing
+        if: steps.npm-auth.outputs.mode == 'trusted-publishing'
+        run: npm publish --access public

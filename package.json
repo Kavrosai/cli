@@ -1,0 +1,40 @@
+{
+  "name": "@enclavia-os/cli",
+  "version": "0.2.2",
+  "description": "Language-agnostic CLI for Enclavia workload egress and diagnostics",
+  "type": "module",
+  "bin": {
+    "enclavia": "bin/enclavia.mjs"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "enclavia",
+    "ai",
+    "llm",
+    "agents",
+    "security",
+    "egress",
+    "dlp",
+    "policy"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Enclavia-OS/cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Enclavia-OS/cli/issues"
+  },
+  "homepage": "https://enclavia.xyz"
+}
