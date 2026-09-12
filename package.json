@@ -1,6 +1,6 @@
 {
   "name": "@enclavia-os/cli",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Language-agnostic CLI for Enclavia workload egress and diagnostics",
   "type": "module",
   "bin": {
