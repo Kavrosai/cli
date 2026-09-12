@@ -36,6 +36,12 @@ Check connectivity and workload configuration:
 enclavia doctor
 ```
 
+Per-command options and examples:
+
+```bash
+enclavia help <command>
+```
+
 Send a policy-bound request:
 
 ```bash
@@ -60,6 +66,35 @@ that do not yet have a native Enclavia SDK.
 Forwarded headers are evaluated against the workload policy like any other
 request content; the CLI warns when a header looks like credentials
 (`Authorization`, `Cookie`, or `x-enclavia-*`).
+
+### When a request is blocked
+
+A block is a governed outcome, not a malfunction. The CLI prints the policy
+reason plus a plain-language explanation: what happened, whether the content
+reached the outside world (blocked requests never do), and what to do next.
+The same explanation is available standalone:
+
+```bash
+enclavia explain 403 --body '{"error":"Blocked by Enclavia","reason":"…"}'
+```
+
+### Verify a signed workflow bundle locally
+
+Before importing a workflow bundle exported from another deployment, verify its
+Ed25519 signature against the trusted public key (`CP_POLICY_PUBLIC_KEY` from
+provisioning) — the same check the import route performs, run on your machine,
+often offline:
+
+```bash
+enclavia verify-bundle workflow.enclavia-bundle.json \
+  --public-key "$CP_POLICY_PUBLIC_KEY"
+```
+
+The key defaults to `ENCLAVIA_POLICY_PUBLIC_KEY`, then `CP_POLICY_PUBLIC_KEY`,
+from the environment. Output names the workflow, revision, origin deployment,
+pinned capabilities, and a fingerprint of the key that verified the signature —
+suitable for pasting into a change record. A tampered or foreign-signed bundle
+exits non-zero with instructions not to import.
 
 ## Development
 
