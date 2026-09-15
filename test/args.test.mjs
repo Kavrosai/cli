@@ -58,14 +58,14 @@ test("requireConfig reports missing variables by environment name", () => {
   );
   assert.throws(
     () => requireConfig({ url: "https://dp.example.com", apiKey: "", agentId: undefined }),
-    /missing ENCLAVIA_API_KEY, ENCLAVIA_AGENT_ID/,
+    /missing KAVROS_API_KEY, KAVROS_AGENT_ID/,
   );
 });
 
 test("sensitiveHeaders flags workload and end-user credentials", () => {
   assert.deepEqual(
-    sensitiveHeaders({ Authorization: "x", "X-Enclavia-Agent-ID": "y", Cookie: "z" }),
-    ["Authorization", "X-Enclavia-Agent-ID", "Cookie"],
+    sensitiveHeaders({ Authorization: "x", "X-Kavros-Agent-ID": "y", Cookie: "z" }),
+    ["Authorization", "X-Kavros-Agent-ID", "Cookie"],
   );
   assert.deepEqual(sensitiveHeaders({ "content-type": "application/json" }), []);
 });

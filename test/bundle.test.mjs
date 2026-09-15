@@ -18,8 +18,8 @@ test("canonicalJson matches JSON.stringify ordering for the control plane's outp
   // The control plane signs canonicalJson(bundle); the CLI recomputes the
   // same canonical form, so identical inputs must produce identical bytes.
   const bundle = {
-    format: "enclavia-workflow-bundle",
-    format_version: 1,
+    format: "kavros-workflow-bundle",
+    format_version: 2,
     workflow: { name: "w", revision: 2 },
     capabilities: [{ key: "k", approved_columns: ["a", "b"] }],
   };
@@ -38,8 +38,8 @@ function makeSignedBundle({ workflowName = "Nightly report" } = {}) {
   const { privateKey, publicKey } = crypto.generateKeyPairSync("ed25519");
   const spkiBase64 = publicKey.export({ format: "der", type: "spki" }).toString("base64");
   const bundle = {
-    format: "enclavia-workflow-bundle",
-    format_version: 1,
+    format: "kavros-workflow-bundle",
+    format_version: 2,
     exported_at: "2026-09-12T00:00:00.000Z",
     origin: { deployment_id: "dep-123", org_name: null },
     workflow: { name: workflowName, description: null, graph: { nodes: [], edges: [] }, revision: 3 },
@@ -95,7 +95,7 @@ test("verifyBundle reports a missing key with actionable guidance", () => {
   const { signed } = makeSignedBundle();
   const result = verifyBundle(signed, { publicKey: undefined });
   assert.equal(result.ok, false);
-  assert.match(result.reason, /ENCLAVIA_POLICY_PUBLIC_KEY|CP_POLICY_PUBLIC_KEY/);
+  assert.match(result.reason, /KAVROS_POLICY_PUBLIC_KEY|CP_POLICY_PUBLIC_KEY/);
 });
 
 test("verifyBundle rejects unknown algorithms and malformed files", () => {
@@ -106,7 +106,7 @@ test("verifyBundle rejects unknown algorithms and malformed files", () => {
   assert.match(verifyBundle(signed, { publicKey: publicKeyBase64 }).reason, /Unsupported signature algorithm/);
   const { signed: s2 } = makeSignedBundle();
   delete s2.bundle.format;
-  assert.match(verifyBundle(s2, { publicKey: publicKeyBase64 }).reason, /Not a valid Enclavia workflow bundle/);
+  assert.match(verifyBundle(s2, { publicKey: publicKeyBase64 }).reason, /Not a valid Kavros workflow bundle/);
 });
 
 // ---------- explainFailure ----------
@@ -114,7 +114,7 @@ test("verifyBundle rejects unknown algorithms and malformed files", () => {
 test("explainFailure: blocked request states egress was not reached", () => {
   const e = explainFailure({
     status: 403,
-    body: { error: "Blocked by Enclavia", reason: "DLP rule matched: credit card" },
+    body: { error: "Blocked by Kavros", reason: "DLP rule matched: credit card" },
   });
   assert.match(e.headline, /Blocked by policy — DLP rule matched/);
   assert.match(e.egress, /Nothing reached the target/);
@@ -134,9 +134,9 @@ test("explainFailure: 502 says policy passed but target failed", () => {
 });
 
 test("explainFailure: missing config gives the export recipe", () => {
-  const e = explainFailure({ configMissing: ["ENCLAVIA_API_KEY"] });
+  const e = explainFailure({ configMissing: ["KAVROS_API_KEY"] });
   assert.match(e.headline, /no workload credentials/);
-  assert.match(e.next.join(" "), /ENCLAVIA_API_KEY/);
+  assert.match(e.next.join(" "), /KAVROS_API_KEY/);
   assert.match(e.egress, /Nothing was sent/);
 });
 

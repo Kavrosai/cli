@@ -1,11 +1,11 @@
 # @enclavia-os/cli
 
-Language-agnostic developer CLI for Enclavia workload egress.
+Language-agnostic developer CLI for Kavros workload egress.
 
 ## Requirements
 
 - Node.js 18 or newer
-- A registered Enclavia workload
+- A registered Kavros workload
 - Network access to the workload's data-plane endpoint
 
 ## Install
@@ -23,9 +23,9 @@ npx @enclavia-os/cli doctor
 ## Configure
 
 ```bash
-export ENCLAVIA_API_URL="https://<data-plane-host>/api/agent/egress"
-export ENCLAVIA_API_KEY="<workload-api-key>"
-export ENCLAVIA_AGENT_ID="<workload-id>"
+export KAVROS_API_URL="https://<data-plane-host>/api/agent/egress"
+export KAVROS_API_KEY="<workload-api-key>"
+export KAVROS_AGENT_ID="<workload-id>"
 ```
 
 ## Commands
@@ -61,11 +61,11 @@ enclavia request --action get --target "https://docs.example.com" --json
 
 The CLI sends credentials as headers and supports the same JSON contract used by
 native clients. It is useful for smoke tests, scripts, jobs, and applications
-that do not yet have a native Enclavia SDK.
+that do not yet have a native Kavros SDK.
 
 Forwarded headers are evaluated against the workload policy like any other
 request content; the CLI warns when a header looks like credentials
-(`Authorization`, `Cookie`, or `x-enclavia-*`).
+(`Authorization`, `Cookie`, or `x-kavros-*`).
 
 ### When a request is blocked
 
@@ -75,7 +75,7 @@ reached the outside world (blocked requests never do), and what to do next.
 The same explanation is available standalone:
 
 ```bash
-enclavia explain 403 --body '{"error":"Blocked by Enclavia","reason":"…"}'
+enclavia explain 403 --body '{"error":"Blocked by Kavros","reason":"…"}'
 ```
 
 ### Verify a signed workflow bundle locally
@@ -86,11 +86,11 @@ provisioning) — the same check the import route performs, run on your machine,
 often offline:
 
 ```bash
-enclavia verify-bundle workflow.enclavia-bundle.json \
+enclavia verify-bundle workflow.kavros-bundle.json \
   --public-key "$CP_POLICY_PUBLIC_KEY"
 ```
 
-The key defaults to `ENCLAVIA_POLICY_PUBLIC_KEY`, then `CP_POLICY_PUBLIC_KEY`,
+The key defaults to `KAVROS_POLICY_PUBLIC_KEY`, then `CP_POLICY_PUBLIC_KEY`,
 from the environment. Output names the workflow, revision, origin deployment,
 pinned capabilities, and a fingerprint of the key that verified the signature —
 suitable for pasting into a change record. A tampered or foreign-signed bundle
