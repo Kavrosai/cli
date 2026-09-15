@@ -1,4 +1,4 @@
-# @enclavia-os/cli
+# @kavrosai/cli
 
 Language-agnostic developer CLI for Kavros workload egress.
 
@@ -11,13 +11,13 @@ Language-agnostic developer CLI for Kavros workload egress.
 ## Install
 
 ```bash
-npm install --global @enclavia-os/cli
+npm install --global @kavrosai/cli
 ```
 
 Or run it without a global install:
 
 ```bash
-npx @enclavia-os/cli doctor
+npx @kavrosai/cli doctor
 ```
 
 ## Configure
@@ -33,19 +33,19 @@ export KAVROS_AGENT_ID="<workload-id>"
 Check connectivity and workload configuration:
 
 ```bash
-enclavia doctor
+kavros doctor
 ```
 
 Per-command options and examples:
 
 ```bash
-enclavia help <command>
+kavros help <command>
 ```
 
 Send a policy-bound request:
 
 ```bash
-enclavia request \
+kavros request \
   --action post_data \
   --target "https://api.example.com/v1/run" \
   --content '{"input":"hello"}' \
@@ -56,7 +56,7 @@ enclavia request \
 Fetch an approved URL:
 
 ```bash
-enclavia request --action get --target "https://docs.example.com" --json
+kavros request --action get --target "https://docs.example.com" --json
 ```
 
 The CLI sends credentials as headers and supports the same JSON contract used by
@@ -75,7 +75,7 @@ reached the outside world (blocked requests never do), and what to do next.
 The same explanation is available standalone:
 
 ```bash
-enclavia explain 403 --body '{"error":"Blocked by Kavros","reason":"…"}'
+kavros explain 403 --body '{"error":"Blocked by Kavros","reason":"…"}'
 ```
 
 ### Verify a signed workflow bundle locally
@@ -86,7 +86,7 @@ provisioning) — the same check the import route performs, run on your machine,
 often offline:
 
 ```bash
-enclavia verify-bundle workflow.kavros-bundle.json \
+kavros verify-bundle workflow.kavros-bundle.json \
   --public-key "$CP_POLICY_PUBLIC_KEY"
 ```
 
@@ -100,7 +100,7 @@ exits non-zero with instructions not to import.
 
 ```bash
 npm test
-node bin/enclavia.mjs --help
+node bin/kavros.mjs --help
 ```
 
 The CLI has no runtime dependencies and supports Node.js 18 and newer. The
@@ -115,7 +115,7 @@ One-time setup on npmjs.com under the package's **Settings → Trusted
 Publisher**:
 
 - Provider: GitHub Actions
-- Organization or user: `Enclavia-OS`
+- Organization or user: `Kavrosai`
 - Repository: `cli`
 - Workflow filename: `publish.yml`
 - Allowed action: npm publish
@@ -129,7 +129,7 @@ git push origin v0.2.3
 ```
 
 Fallback until Trusted Publishing is configured: add an npm granular access
-token with publish permission for `@enclavia-os/cli` and **bypass 2FA** enabled
+token with publish permission for `@kavrosai/cli` and **bypass 2FA** enabled
 as the `NPM_TOKEN` Actions secret. The workflow then publishes without
 provenance (`EOTP` failures in Actions mean 2FA bypass was not enabled).
 Provenance requires a public source repository, so Trusted Publishing is the

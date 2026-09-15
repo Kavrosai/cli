@@ -2,14 +2,14 @@
 
 ## Reporting a vulnerability
 
-Email **security@enclavia.xyz**. Please do not include live credentials,
+Email **security@kavros.xyz**. Please do not include live credentials,
 customer data, private keys, or working exploit payloads in an initial
 report — the minimum useful evidence is the affected version, the impact,
 and reproduction steps.
 
 ## Scope
 
-The `@enclavia-os/cli` npm package.
+The `@kavrosai/cli` npm package.
 
 ## What to expect
 
@@ -20,4 +20,4 @@ The `@enclavia-os/cli` npm package.
 ## Supported releases
 
 Only the latest published version receives security fixes. Upgrade via
-`npm install -g @enclavia-os/cli@latest`.
+`npm install -g @kavrosai/cli@latest`.

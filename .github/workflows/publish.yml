@@ -1,4 +1,4 @@
-name: Publish @enclavia-os/cli
+name: Publish @kavrosai/cli
 
 on:
   push:
