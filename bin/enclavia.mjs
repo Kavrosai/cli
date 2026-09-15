@@ -19,7 +19,7 @@ const { version: VERSION } = JSON.parse(
 );
 
 function usage() {
-  console.log(`Enclavia CLI ${VERSION}
+  console.log(`Kavros CLI ${VERSION}
 
 Language-agnostic tools for protected workload egress.
 
@@ -39,10 +39,10 @@ Commands:
   explain        Plain-language meaning of a governed-request failure
 
 Environment:
-  ENCLAVIA_API_URL             Data-plane egress URL
-  ENCLAVIA_API_KEY             Workload API key
-  ENCLAVIA_AGENT_ID            Workload ID
-  ENCLAVIA_POLICY_PUBLIC_KEY   Trusted public key for verify-bundle (optional)
+  KAVROS_API_URL             Data-plane egress URL
+  KAVROS_API_KEY             Workload API key
+  KAVROS_AGENT_ID            Workload ID
+  KAVROS_POLICY_PUBLIC_KEY   Trusted public key for verify-bundle (optional)
 
 Run 'enclavia help <command>' for command-specific options and examples.
 
@@ -50,7 +50,7 @@ Examples:
   enclavia doctor
   enclavia request --action post_data --target https://api.example.com/v1/run \\
     --content '{"input":"hello"}'
-  enclavia verify-bundle workflow.enclavia-bundle.json
+  enclavia verify-bundle workflow.kavros-bundle.json
 `);
 }
 
@@ -73,7 +73,7 @@ Options:
   --json                    formatted JSON output
   --timeout <seconds>       request timeout (default: 120)
 
-Environment: ENCLAVIA_API_URL, ENCLAVIA_API_KEY, ENCLAVIA_AGENT_ID
+Environment: KAVROS_API_URL, KAVROS_API_KEY, KAVROS_AGENT_ID
 
 Examples:
   enclavia request --action get --target https://docs.example.com --json
@@ -85,7 +85,7 @@ Examples:
 Verifies that the data plane is reachable and the configured workload
 identity is accepted. Requires the same environment as request.
 
-Environment: ENCLAVIA_API_URL, ENCLAVIA_API_KEY, ENCLAVIA_AGENT_ID
+Environment: KAVROS_API_URL, KAVROS_API_KEY, KAVROS_AGENT_ID
 
 Example:
   enclavia doctor
@@ -102,7 +102,7 @@ Usage:
 
 Options:
   --public-key <base64>  Trusted public key (SPKI DER or raw32 base64).
-                         Falls back to ENCLAVIA_POLICY_PUBLIC_KEY, then
+                         Falls back to KAVROS_POLICY_PUBLIC_KEY, then
                          CP_POLICY_PUBLIC_KEY.
   --json                 Print the verification result as JSON
 
@@ -110,7 +110,7 @@ The key to trust is the CP_POLICY_PUBLIC_KEY value provisioning shares
 between the exporting and importing deployments.
 
 Examples:
-  enclavia verify-bundle workflow.enclavia-bundle.json
+  enclavia verify-bundle workflow.kavros-bundle.json
   enclavia verify-bundle bundle.json --public-key "MCowBQYDK2VwAyEA…"
 `,
     explain: `enclavia explain — plain-language meaning of a governed failure
@@ -123,7 +123,7 @@ Usage:
   enclavia explain <http-status> [--body '<json>']
 
 Examples:
-  enclavia explain 403 --body '{"error":"Blocked by Enclavia","reason":"DLP rule matched"}'
+  enclavia explain 403 --body '{"error":"Blocked by Kavros","reason":"DLP rule matched"}'
   enclavia explain 429
 `,
   };
@@ -177,7 +177,7 @@ async function request(options) {
   }
   const headers = {
     Authorization: `Bearer ${values.apiKey}`,
-    "X-Enclavia-Agent-ID": values.agentId,
+    "X-Kavros-Agent-ID": values.agentId,
     "Content-Type": "application/json",
   };
   const payload = {
@@ -278,9 +278,9 @@ function explainCommand(options) {
 async function doctor() {
   const values = config();
   const missing = [];
-  if (!values.url) missing.push("ENCLAVIA_API_URL");
-  if (!values.apiKey) missing.push("ENCLAVIA_API_KEY");
-  if (!values.agentId) missing.push("ENCLAVIA_AGENT_ID");
+  if (!values.url) missing.push("KAVROS_API_URL");
+  if (!values.apiKey) missing.push("KAVROS_API_KEY");
+  if (!values.agentId) missing.push("KAVROS_AGENT_ID");
   if (missing.length > 0) {
     console.error(`Missing environment variables: ${missing.join(", ")}`);
     process.exitCode = 1;
@@ -295,7 +295,7 @@ async function doctor() {
     response = await fetchWithTimeout(healthUrl, {
       headers: {
         Authorization: `Bearer ${values.apiKey}`,
-        "X-Enclavia-Agent-ID": values.agentId,
+        "X-Kavros-Agent-ID": values.agentId,
       },
     }, 10);
   } catch (error) {
