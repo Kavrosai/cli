@@ -24,13 +24,13 @@ function usage() {
 Language-agnostic tools for protected workload egress.
 
 Usage:
-  enclavia request --action <action> --target <url> [--content <json|string>]
-  enclavia doctor
-  enclavia verify-bundle <file> [--public-key <base64>]
-  enclavia explain <http-status> [--body <json>]
-  enclavia help <command>
-  enclavia --version
-  enclavia --help
+  kavros request --action <action> --target <url> [--content <json|string>]
+  kavros doctor
+  kavros verify-bundle <file> [--public-key <base64>]
+  kavros explain <http-status> [--body <json>]
+  kavros help <command>
+  kavros --version
+  kavros --help
 
 Commands:
   request        Send a policy-bound request through the data plane
@@ -44,23 +44,23 @@ Environment:
   KAVROS_AGENT_ID            Workload ID
   KAVROS_POLICY_PUBLIC_KEY   Trusted public key for verify-bundle (optional)
 
-Run 'enclavia help <command>' for command-specific options and examples.
+Run 'kavros help <command>' for command-specific options and examples.
 
 Examples:
-  enclavia doctor
-  enclavia request --action post_data --target https://api.example.com/v1/run \\
+  kavros doctor
+  kavros request --action post_data --target https://api.example.com/v1/run \\
     --content '{"input":"hello"}'
-  enclavia verify-bundle workflow.kavros-bundle.json
+  kavros verify-bundle workflow.kavros-bundle.json
 `);
 }
 
 function commandHelp(command) {
   const pages = {
-    request: `enclavia request — send a policy-bound request through the data plane
+    request: `kavros request — send a policy-bound request through the data plane
 
 The request is evaluated against the workload's signed policy: identity,
 allowlist, DLP, and metering. A block is a governed outcome, not an error —
-use \`enclavia explain\` or the failure footer for what to do next.
+use \`kavros explain\` or the failure footer for what to do next.
 
 Required:
   --action <action>     e.g. get or post_data (per the workload's policy)
@@ -76,11 +76,11 @@ Options:
 Environment: KAVROS_API_URL, KAVROS_API_KEY, KAVROS_AGENT_ID
 
 Examples:
-  enclavia request --action get --target https://docs.example.com --json
-  enclavia request --action post_data --target https://api.example.com/v1/run \\
+  kavros request --action get --target https://docs.example.com --json
+  kavros request --action post_data --target https://api.example.com/v1/run \\
     --content '{"input":"hello"}'
 `,
-    doctor: `enclavia doctor — check connectivity and workload configuration
+    doctor: `kavros doctor — check connectivity and workload configuration
 
 Verifies that the data plane is reachable and the configured workload
 identity is accepted. Requires the same environment as request.
@@ -88,9 +88,9 @@ identity is accepted. Requires the same environment as request.
 Environment: KAVROS_API_URL, KAVROS_API_KEY, KAVROS_AGENT_ID
 
 Example:
-  enclavia doctor
+  kavros doctor
 `,
-    "verify-bundle": `enclavia verify-bundle — verify a signed workflow bundle locally
+    "verify-bundle": `kavros verify-bundle — verify a signed workflow bundle locally
 
 Checks the Ed25519 signature on a bundle exported from a control plane
 against a trusted public key. This is the same verification the import
@@ -98,7 +98,7 @@ route performs, run on your machine — useful before importing a bundle
 and for security review. Works offline; no deployment connection needed.
 
 Usage:
-  enclavia verify-bundle <file> [--public-key <base64>]
+  kavros verify-bundle <file> [--public-key <base64>]
 
 Options:
   --public-key <base64>  Trusted public key (SPKI DER or raw32 base64).
@@ -110,26 +110,26 @@ The key to trust is the CP_POLICY_PUBLIC_KEY value provisioning shares
 between the exporting and importing deployments.
 
 Examples:
-  enclavia verify-bundle workflow.kavros-bundle.json
-  enclavia verify-bundle bundle.json --public-key "MCowBQYDK2VwAyEA…"
+  kavros verify-bundle workflow.kavros-bundle.json
+  kavros verify-bundle bundle.json --public-key "MCowBQYDK2VwAyEA…"
 `,
-    explain: `enclavia explain — plain-language meaning of a governed failure
+    explain: `kavros explain — plain-language meaning of a governed failure
 
 Turns a data-plane status/body into what happened, whether egress was
 reached, and what to do next. Also prints automatically when a request
 fails (unless --json is set).
 
 Usage:
-  enclavia explain <http-status> [--body '<json>']
+  kavros explain <http-status> [--body '<json>']
 
 Examples:
-  enclavia explain 403 --body '{"error":"Blocked by Kavros","reason":"DLP rule matched"}'
-  enclavia explain 429
+  kavros explain 403 --body '{"error":"Blocked by Kavros","reason":"DLP rule matched"}'
+  kavros explain 429
 `,
   };
   const page = pages[command];
   if (!page) {
-    console.error(`enclavia: no help for "${command}". Commands: request, doctor, verify-bundle, explain.`);
+    console.error(`kavros: no help for "${command}". Commands: request, doctor, verify-bundle, explain.`);
     process.exitCode = 2;
     return;
   }
@@ -137,7 +137,7 @@ Examples:
 }
 
 function fail(message, code = 2) {
-  console.error(`enclavia: ${message}`);
+  console.error(`kavros: ${message}`);
   process.exitCode = code;
 }
 
@@ -173,7 +173,7 @@ async function request(options) {
 
   const upstreamHeaders = parseHeaders(options.headers);
   for (const name of sensitiveHeaders(upstreamHeaders)) {
-    console.error(`enclavia: warning: forwarding sensitive header "${name}" to the upstream target; omit it unless the target requires it`);
+    console.error(`kavros: warning: forwarding sensitive header "${name}" to the upstream target; omit it unless the target requires it`);
   }
   const headers = {
     Authorization: `Bearer ${values.apiKey}`,
@@ -259,7 +259,7 @@ async function verifyBundleCommand(options) {
 
 function explainCommand(options) {
   const status = Number(options._[1]);
-  if (!Number.isInteger(status) || status < 100) throw new Error("explain requires an HTTP status, e.g. enclavia explain 403");
+  if (!Number.isInteger(status) || status < 100) throw new Error("explain requires an HTTP status, e.g. kavros explain 403");
   let body;
   if (options.body) {
     try {
@@ -336,7 +336,7 @@ async function main() {
     else if (command === "verify-bundle") await verifyBundleCommand(options);
     else if (command === "explain") explainCommand(options);
     else if (command === "help" && options._[1]) commandHelp(options._[1]);
-    else throw new Error(`unknown command ${command ?? ""}; run enclavia --help`);
+    else throw new Error(`unknown command ${command ?? ""}; run kavros --help`);
   } catch (error) {
     fail(error.message);
   }

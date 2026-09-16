@@ -32,5 +32,5 @@ jobs:
 
       - name: Smoke test the CLI entrypoint
         run: |
-          node bin/enclavia.mjs --version
-          node bin/enclavia.mjs --help > /dev/null
+          node bin/kavros.mjs --version
+          node bin/kavros.mjs --help > /dev/null
