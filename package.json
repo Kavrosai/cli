@@ -1,6 +1,6 @@
 {
   "name": "@kavrosai/cli",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Language-agnostic CLI for Kavros workload egress and diagnostics",
   "type": "module",
   "bin": {
