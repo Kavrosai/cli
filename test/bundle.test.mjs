@@ -121,10 +121,26 @@ test("explainFailure: blocked request states egress was not reached", () => {
   assert.ok(e.next.length > 0);
 });
 
-test("explainFailure: auth failure points at identity, not policy", () => {
-  const e = explainFailure({ status: 401, body: null });
+test("explainFailure: data-plane credential rejection points at identity", () => {
+  // The data plane's own rejections carry a flat string `error` field.
+  const e = explainFailure({ status: 401, body: { error: "Missing Kavros credentials" } });
   assert.match(e.headline, /identity was rejected/);
   assert.match(e.egress, /before any policy evaluation/);
+});
+
+test("explainFailure: upstream auth refusal says the target answered", () => {
+  // A 401/403 from the UPSTREAM (after policy passed) must not be reported
+  // as identity rejection — egress physically happened. Stripe nests `error`
+  // as an object; other APIs send raw text or their own shapes.
+  const e = explainFailure({ status: 401, body: { error: { type: "invalid_request_error" } } });
+  assert.match(e.headline, /upstream target answered HTTP 401/);
+  assert.match(e.egress, /reached the target/);
+  assert.match(e.egress, /not a Kavros denial/);
+  assert.match(e.next.join(" "), /credential/i);
+
+  const gh = explainFailure({ status: 403, body: { raw_text: "Request forbidden…User-Agent" } });
+  assert.match(gh.headline, /upstream target answered HTTP 403/);
+  assert.match(gh.next.join(" "), /User-Agent/);
 });
 
 test("explainFailure: 502 says policy passed but target failed", () => {
